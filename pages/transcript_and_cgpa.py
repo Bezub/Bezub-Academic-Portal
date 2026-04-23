@@ -74,7 +74,7 @@ with st.spinner("Accessing cloud records..."):
 
         st.dataframe(display_df, use_container_width=True, hide_index=True)
 
-        pdf_data = bytes(create_pdf(display_df, username, cgpa)).getvalue()
+        pdf_data = create_pdf(display_df, username, cgpa).getvalue()
         st.download_button(
             label="📑 Download Unofficial PDF Transcript",
             data=pdf_data,
