@@ -94,13 +94,12 @@ with st.spinner("Accessing cloud records..."):
                       markers=True,
                       color_discrete_sequence=["#D1B3FF", "#4A148C"])
 
-        # This line fixes the scale to exactly 0 and 4
         fig.update_yaxes(range=[0, 4])
 
         st.plotly_chart(fig, use_container_width=True)
 
         st.divider()
-        st.subheader("🎯 Target CGPA Roadmap")
+        st.subheader(" Target CGPA Roadmap")
         next_credits = st.number_input("Expected Credits for Next Semester:", 1, 40, 30)
         curr_points = (df['gpa'] * df['total_ects']).sum()
         curr_ects = df['total_ects'].sum()
@@ -113,7 +112,7 @@ with st.spinner("Accessing cloud records..."):
         if goal_data: st.table(pd.DataFrame(goal_data))
 
         st.divider()
-        st.subheader("🎓 Export Unofficial Document")
+        st.subheader(" Export Unofficial Document")
         full_name_input = st.text_input("Full Name:", placeholder="e.g. Johnathan Doe")
         if full_name_input:
             try:
