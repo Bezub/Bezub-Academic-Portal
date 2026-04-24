@@ -39,7 +39,6 @@ if not st.session_state.username:
     handle_auth()
     st.stop()
 
-# --- SIDEBAR WITH CONTACT ADMIN ---
 with st.sidebar:
     st.success(f"👤 Logged in: **{st.session_state.username}**")
 
@@ -93,7 +92,6 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# Feature Boxes
 st.subheader("Your Academic Suite")
 col1, col2, col3 = st.columns(3)
 with col1:
@@ -114,9 +112,6 @@ st.info("**Why Bezub?** We don't just calculate numbers; we help you plan your f
 
 st.write("---")
 
-# 1. Define the HTML in a variable first (Cleaner way)
-# --- THE "STAY RENDERED" FIX ---
-
 layout_code = """
 <div style="background-color: #F3EAFD; padding: 25px; border-radius: 15px; border: 2px solid #D1B3FF; text-align: center; font-family: sans-serif;">
     <h2 style="color: #4A148C; margin: 0 0 10px 0;">Beyond Calculation. This is Strategy.</h2>
@@ -130,7 +125,6 @@ layout_code = """
 </div>
 """
 
-# CRITICAL: Make sure the line below is EXACTLY like this
 st.markdown(layout_code, unsafe_allow_html=True)
 
 st.write("")
