@@ -117,10 +117,10 @@ layout_code = """
     <h2 style="color: #4A148C; margin: 0 0 10px 0;">Beyond Calculation. This is Strategy.</h2>
     <p style="color: #4A148C; font-size: 16px; font-weight: bold;">Why Ambitious Students Choose Bezub Pro</p>
     <div style="text-align: left; display: inline-block; color: #4A148C; margin-top: 15px;">
-        <p>🛡 <b>The Cloud Vault:</b> Secure your entire academic history.</p>
-        <p>📄 <b>Instant Transcripts:</b> Internship-ready PDFs in one click.</p>
-        <p>🎯 <b>Goal Roadmap:</b> Exact grades needed to hit your targets.</p>
-        <p>✨ <b>Ad-Free:</b> Focus on your future, not distractions.</p>
+        <p> <b>The Cloud Vault:</b> Secure your entire academic history.</p>
+        <p> <b>Instant Transcripts:</b> Internship-ready PDFs in one click.</p>
+        <p> <b>Goal Roadmap:</b> Exact grades needed to hit your targets.</p>
+        <p> <b>Ad-Free:</b> Focus on your future, not distractions.</p>
     </div>
 </div>
 """
@@ -128,7 +128,7 @@ layout_code = """
 st.markdown(layout_code, unsafe_allow_html=True)
 
 st.write("")
-if st.button("🚀 UPGRADE TO BEZUB PRO", use_container_width=True):
+if st.button(" UPGRADE TO BEZUB PRO", use_container_width=True):
     st.balloons()
     st.toast("Pro features are coming soon!", icon="🎓")
 
