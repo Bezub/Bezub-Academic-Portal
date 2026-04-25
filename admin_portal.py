@@ -29,3 +29,7 @@ else:
         supabase.table("tickets").update({"status": "resolved"}).eq("id", ticket_id).execute()
         st.success(f"Ticket #{ticket_id} updated!")
         st.rerun()
+
+st.markdown(
+    "<p style='text-align: center; color: #4A148C; font-size: 12px; margin-top: 50px; opacity: 0.6;'>© 2026 Bezub Academic Systems.</p>",
+    unsafe_allow_html=True)
