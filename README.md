@@ -1,4 +1,4 @@
-# Bezub Academic Portal
+# Bezub Academic Portal (Version 1)
 
 A strategic GPA management system built with **Python**, **Streamlit**, and **Supabase**. 
 
