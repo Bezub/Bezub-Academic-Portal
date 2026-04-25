@@ -120,4 +120,8 @@ with st.spinner("Accessing cloud records..."):
                 st.download_button(label="📑 Download Unofficial PDF Transcript", data=pdf_bytes, file_name=f"{full_name_input.replace(' ', '_')}_Transcript.pdf", mime="application/pdf")
             except Exception as e: st.error(f"Error: {e}")
 
+st.markdown(
+    "<p style='text-align: center; color: #4A148C; font-size: 12px; margin-top: 50px; opacity: 0.6;'>© 2026 Bezub Academic Systems.</p>",
+    unsafe_allow_html=True)
+
 
