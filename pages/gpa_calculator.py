@@ -48,9 +48,13 @@ for i in range(int(num_courses)):
     with st.expander(f"Course {i + 1}", expanded=True):
         c1, c2, c3 = st.columns([3, 1, 1])
         title = c1.text_input("Course Title", key=f"t{i}", placeholder="e.g. Discrete Math")
-        score = c2.number_input("Score", 0.0, 100.0, key=f"s{i}")
+        score = c2.number_input(
+            "Score", min_value=0.0, max_value=100.0, value=None,
+            placeholder="e.g. 85", key=f"s{i}"
+        )
         ects = c3.number_input("ECTS", 1, 20, key=f"e{i}")
-        data.append({"Title": title, "Score": score, "ECTS": ects, "Point": gfec(score)})
+        score_val = score if score is not None else 0.0
+        data.append({"Title": title, "Score": score_val, "ECTS": ects, "Point": gfec(score_val)})
 
 if st.button("Calculate GPA"):
     df = pd.DataFrame(data)
@@ -107,4 +111,3 @@ if st.button("Confirm and Save"):
 st.markdown(
     "<p style='text-align: center; color: #4A148C; font-size: 12px; margin-top: 50px; opacity: 0.6;'>© 2026 Bezub Academic Systems.</p>",
     unsafe_allow_html=True)
-                    
