@@ -17,4 +17,11 @@ A strategic GPA management system built with **Python**, **Streamlit**, and **Su
 3. Add Supabase keys to `.streamlit/secrets.toml`.
 4. Run: `streamlit run app.py`
 
----
+## Screenshots
+![Welcome](screenshots/welcome.png)
+
+![Home](screenshots/home.png)
+
+![Gpa-calculator](screenshots/gpa_calculator.png)
+
+![Transcript](screenshots/transcript.png)
