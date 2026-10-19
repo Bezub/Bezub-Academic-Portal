@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import datetime
-from database import supabase, check_auth, apply_custom_design
+from database import run_sql, check_auth, apply_custom_design
 from fpdf import FPDF
 
 apply_custom_design()
@@ -46,13 +46,16 @@ def create_pdf(df, full_name, cgpa):
 
 # --- DATA RETRIEVAL ---
 with st.spinner("Accessing cloud records..."):
-    response = supabase.table("gpa_records").select("*").eq("username", username).execute()
+    records = run_sql("select * from gpa_records where username = %s", (username,))
 
-    if not response.data:
+    if not records:
         st.warning(f"Hello {username}, we couldn't find any records yet.")
         st.write("Go to the **GPA Calculator** page to calculate and save your first semester!")
     else:
-        df = pd.DataFrame(response.data)
+        df = pd.DataFrame(records)
+        # Postgres can return numeric columns as Decimal, so convert to plain numbers
+        df['gpa'] = df['gpa'].astype(float)
+        df['total_ects'] = df['total_ects'].astype(int)
         df['created_at_dt'] = pd.to_datetime(df['created_at']) # Keep full timestamp for precise deletion
         df['Date Recorded'] = df['created_at_dt'].dt.date
 
@@ -77,7 +80,11 @@ with st.spinner("Accessing cloud records..."):
             # We use the full original list to ensure we can map back to the ID or exact timestamp
             to_delete_date = st.selectbox("Select Record Date to Delete:", df['created_at'].tolist())
             if st.button("Delete Permanently", type="primary"):
-                supabase.table("gpa_records").delete().eq("username", username).eq("created_at", to_delete_date).execute()
+                run_sql(
+                    "delete from gpa_records where username = %s and created_at = %s",
+                    (username, to_delete_date),
+                    fetch=False,
+                )
                 st.success("Record removed!")
                 st.rerun()
 
