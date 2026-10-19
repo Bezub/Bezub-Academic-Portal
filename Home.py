@@ -1,6 +1,7 @@
 import streamlit as st
 import datetime
-from database import supabase, apply_custom_design
+from werkzeug.security import generate_password_hash, check_password_hash
+from database import run_sql, apply_custom_design
 
 st.set_page_config(page_title="Bezub's Academic Portal", layout="wide")
 apply_custom_design()
@@ -17,18 +18,39 @@ def handle_auth():
 
     if choice == "Register":
         if st.button("Create Account"):
-            check = supabase.table("users").select("*").eq("username", user).execute()
-            if check.data:
+            check = run_sql("select 1 from users where username = %s", (user,))
+            if check:
                 st.error("Username already taken!")
             elif len(user) < 4 or len(pwd) < 4:
                 st.error("Username and Password must be at least 4 characters.")
             else:
-                supabase.table("users").insert({"username": user, "password": pwd}).execute()
+                run_sql(
+                    "insert into users (username, password) values (%s, %s)",
+                    (user, generate_password_hash(pwd)),
+                    fetch=False,
+                )
                 st.success("Account created! You can now switch to Login.")
     else:
         if st.button("Login"):
-            res = supabase.table("users").select("*").eq("username", user).eq("password", pwd).execute()
-            if res.data:
+            rows = run_sql("select password from users where username = %s", (user,))
+            ok = False
+            if rows:
+                stored = rows[0]["password"]
+                if stored.startswith(("scrypt:", "pbkdf2:")):
+                    ok = check_password_hash(stored, pwd)
+                elif stored == pwd:
+                    # old account with a plain-text password: let them in once,
+                    # and upgrade it to a hash so it is never stored in plain text again
+                    ok = True
+                    try:
+                        run_sql(
+                            "update users set password = %s where username = %s",
+                            (generate_password_hash(pwd), user),
+                            fetch=False,
+                        )
+                    except Exception:
+                        pass
+            if ok:
                 st.session_state.username = user
                 st.rerun()
             else:
@@ -48,11 +70,11 @@ with st.sidebar:
     if st.button("Submit Ticket"):
         if ticket_msg:
             try:
-                supabase.table("tickets").insert({
-                    "username": st.session_state.username,
-                    "message": ticket_msg,
-                    "status": "open"
-                }).execute()
+                run_sql(
+                    "insert into tickets (username, message, status) values (%s, %s, 'open')",
+                    (st.session_state.username, ticket_msg),
+                    fetch=False,
+                )
                 st.toast("Ticket submitted successfully!", icon="🚀")
             except:
                 st.error("Ticket system offline. Please email admin@bezub.com")
