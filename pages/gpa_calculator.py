@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import datetime
-from database import supabase, check_auth, apply_custom_design
+from database import run_sql, check_auth, apply_custom_design
 
 apply_custom_design()
 
@@ -81,13 +81,12 @@ if st.button("Confirm and Save"):
             today = str(datetime.date.today())
 
             # Check if this user already saved a record today
-            existing = supabase.table("gpa_records") \
-                .select("*") \
-                .eq("username", username) \
-                .eq("created_at", today) \
-                .execute()
+            existing = run_sql(
+                "select 1 from gpa_records where username = %s and created_at::date = %s",
+                (username, today),
+            )
 
-            if existing.data:
+            if existing:
                 st.warning(f"⚠️ You have already saved a GPA record for today ({today}).")
                 st.info(
                     "To avoid duplicate entries, you can only save one record per day. If this was a mistake, contact your admin.")
@@ -96,12 +95,11 @@ if st.button("Confirm and Save"):
                     clean_gpa = float(st.session_state.current_gpa)
                     clean_ects = int(st.session_state.current_ects)
 
-                    supabase.table("gpa_records").insert({
-                        "username": username,  # Locked to logged-in user
-                        "gpa": clean_gpa,
-                        "total_ects": clean_ects,
-                        "created_at": today
-                    }).execute()
+                    run_sql(
+                        "insert into gpa_records (username, gpa, total_ects, created_at) values (%s, %s, %s, %s)",
+                        (username, clean_gpa, clean_ects, today),  # username locked to logged-in user
+                        fetch=False,
+                    )
 
                     st.success(f"✅ Successfully saved to the cloud for {username}!")
                     st.balloons()
