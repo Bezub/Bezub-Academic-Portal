@@ -4,3 +4,4 @@ pandas
 fpdf2
 plotly
 werkzeug
+psycopg2-binary
