@@ -1,14 +1,44 @@
 import streamlit as st
-from supabase import create_client
+import psycopg2
+import psycopg2.extras
 
-URL = st.secrets["SUPABASE_URL"]
-KEY = st.secrets["SUPABASE_KEY"]
 
 @st.cache_resource
-def init_connection():
-    return create_client(URL, KEY)
+def get_conn():
+    # Neon pooled connection string, stored in Streamlit secrets as DATABASE_URL
+    return psycopg2.connect(st.secrets["DATABASE_URL"], connect_timeout=20)
 
-supabase = init_connection()
+
+def run_sql(sql, params=None, fetch=True):
+    """Run one SQL statement with %s placeholders.
+
+    fetch=True  -> returns a list of dicts (for SELECT)
+    fetch=False -> returns None (for INSERT / UPDATE / DELETE)
+
+    Neon sleeps when idle and drops open connections, so if the cached
+    connection has gone stale we reconnect and retry once.
+    """
+    for attempt in range(2):
+        conn = get_conn()
+        try:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute(sql, params)
+                rows = cur.fetchall() if fetch else None
+            conn.commit()
+            return rows
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            # stale / dropped connection: throw it away and try again once
+            get_conn.clear()
+            if attempt == 1:
+                raise
+        except Exception:
+            # real SQL error (bad query, constraint violation...): clean up and re-raise
+            try:
+                conn.rollback()
+            except Exception:
+                pass
+            raise
+
 
 def check_auth():
     if "username" not in st.session_state or st.session_state.username is None:
