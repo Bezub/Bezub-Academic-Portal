@@ -5,19 +5,10 @@ import psycopg2.extras
 
 @st.cache_resource
 def get_conn():
-    # Neon pooled connection string, stored in Streamlit secrets as DATABASE_URL
     return psycopg2.connect(st.secrets["DATABASE_URL"], connect_timeout=20)
 
 
 def run_sql(sql, params=None, fetch=True):
-    """Run one SQL statement with %s placeholders.
-
-    fetch=True  -> returns a list of dicts (for SELECT)
-    fetch=False -> returns None (for INSERT / UPDATE / DELETE)
-
-    Neon sleeps when idle and drops open connections, so if the cached
-    connection has gone stale we reconnect and retry once.
-    """
     for attempt in range(2):
         conn = get_conn()
         try:
@@ -27,12 +18,10 @@ def run_sql(sql, params=None, fetch=True):
             conn.commit()
             return rows
         except (psycopg2.OperationalError, psycopg2.InterfaceError):
-            # stale / dropped connection: throw it away and try again once
             get_conn.clear()
             if attempt == 1:
                 raise
         except Exception:
-            # real SQL error (bad query, constraint violation...): clean up and re-raise
             try:
                 conn.rollback()
             except Exception:
