@@ -53,10 +53,9 @@ with st.spinner("Accessing cloud records..."):
         st.write("Go to the **GPA Calculator** page to calculate and save your first semester!")
     else:
         df = pd.DataFrame(records)
-        # Postgres can return numeric columns as Decimal, so convert to plain numbers
         df['gpa'] = df['gpa'].astype(float)
         df['total_ects'] = df['total_ects'].astype(int)
-        df['created_at_dt'] = pd.to_datetime(df['created_at']) # Keep full timestamp for precise deletion
+        df['created_at_dt'] = pd.to_datetime(df['created_at']) 
         df['Date Recorded'] = df['created_at_dt'].dt.date
 
         total_quality_points = (df['gpa'] * df['total_ects']).sum()
@@ -77,7 +76,6 @@ with st.spinner("Accessing cloud records..."):
         st.divider()
         st.subheader("Manage Records")
         with st.expander("Remove an Incorrect Entry"):
-            # We use the full original list to ensure we can map back to the ID or exact timestamp
             to_delete_date = st.selectbox("Select Record Date to Delete:", df['created_at'].tolist())
             if st.button("Delete Permanently", type="primary"):
                 run_sql(
